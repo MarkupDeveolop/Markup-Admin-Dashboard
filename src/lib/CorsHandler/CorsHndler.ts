@@ -14,7 +14,7 @@ export const CorsHandler = (req: NextRequest) => {
     "https://www.asasy.net",
     "https://qasr-alsutan-store.vercel.app",
     "https://https://qasr-alsutan-dashboard-lfc5.vercel.app",
-    "https://markup-mange-admin-dashboard.vercel.app",
+    "https://markup-admin-dashboard.vercel.app",
   ];
 
   const origin = req.headers.get("Origin");
