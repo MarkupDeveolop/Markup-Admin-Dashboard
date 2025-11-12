@@ -34,22 +34,21 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+
 model User {
-  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
-  email          String?        @unique
+  email          String?       @unique
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
-  role           Role           @default(USER) // Added role field
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt // Fixed naming inconsistency
+  role           Role          @default(USER) // Added role field
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt // Fixed naming inconsistency
   phone          String?
   accounts       Account[]
   sessions       Session[]
-
-  brandQrCode BrandQrCode[]
-
+    brandQrCode BrandQrCode[]
 
   OrderItem OrderItem[]
 }
