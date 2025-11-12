@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 98%; /* #F9FAFB */
+    --foreground: 222.2 47.4% 11.2%; /* #0F172A */
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    /* Modernized Brand Colors */
+    --primary: 213 100% 25%; /* #004080 */
+    --primary-foreground: 210 40% 98%; /* white-ish text */
+
+    --secondary: 48 100% 55%; /* #FDC500 */
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%; /* #E2E8F0 */
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 48 100% 55%; /* yellow-gold accent */
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 215 25% 85%; /* subtle gray border */
+    --input: 215 25% 85%;
+    --ring: 213 100% 25%; /* navy ring */
+
+    --chart-1: 48 100% 55%;
+    --chart-2: 213 100% 25%;
+    --chart-3: 213 70% 40%;
+    --chart-4: 210 30% 60%;
+    --chart-5: 48 90% 60%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 40% 6%; /* #0B1120 */
+    --foreground: 48 100% 90%; /* light yellowish text */
+
+    --card: 220 40% 8%;
+    --card-foreground: 48 100% 90%;
+
+    --popover: 220 40% 8%;
+    --popover-foreground: 48 100% 90%;
+
+    --primary: 224 57% 34%; /* #1E3A8A */
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 48 97% 60%; /* #FACC15 */
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 48 97% 60%; /* warm yellow accent */
+    --accent-foreground: 220 40% 6%;
+
+    --destructive: 0 62.8% 40.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 48 97% 60%; /* golden focus ring */
+
+    --chart-1: 48 100% 55%;
+    --chart-2: 224 57% 34%;
+    --chart-3: 48 90% 60%;
+    --chart-4: 224 70% 40%;
+    --chart-5: 48 100% 70%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .container {
+    @apply mx-auto px-4 md:px-8 lg:px-16 xl:px-32;
+  }
+  .section-gap {
+    @apply my-8 md:my-16;
+  }
+  .element-center {
+    @apply flex items-center justify-center;
+  }
+}
+
+/* Dialog RTL/LTR Alignment */
+div[role="dialog"] button {
+  inset-inline-end: 24px !important;
+}
+html[lang="ar"] div[role="dialog"] button {
+  inset-inline-end: auto !important;
+  inset-inline-start: 24px !important;
+}

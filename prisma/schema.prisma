@@ -1,0 +1,547 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id             String         @id @default(auto()) @map("_id") @db.ObjectId
+  name           String?
+  email          String?        @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?
+  role           Role           @default(USER) // Added role field
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt // Fixed naming inconsistency
+  phone          String?
+  accounts       Account[]
+  sessions       Session[]
+
+  brandQrCode BrandQrCode[]
+
+
+  OrderItem OrderItem[]
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+enum Role {
+  OWNER
+  MANAGER
+  ADMIN
+  AdminOne
+  AdminTwo
+  USER
+}
+
+
+
+// ________________ Start Constance _________________________________
+model HeroSection {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  titleEn String
+  titleAr String
+  subtitleEn String @default("")
+  subtitleAr String @default("")
+  descEn   String @default("")
+  descAr   String @default("")
+  imageUrl String @default("")
+  bgUrl    String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+model CallToAction {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  titleEn String
+  titleAr String
+  subtitleEn String @default("")
+  subtitleAr String @default("")
+  imageUrl String @default("")
+  bgUrl    String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+
+model Achievement {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String @unique
+  imageUrl        String    
+  nameEn     String
+  nameAr     String
+  titleEn     String
+  titleAr     String
+  subtitleEn String
+  subtitleAr String
+  achievementFeature    AchievementFeature[]  // relation to features
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model AchievementFeature {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  achievementId   String          @db.ObjectId
+  achievement     Achievement   @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  featureEn   String
+  featureAr   String
+}
+
+
+
+// ________________ End Constance _________________________________
+
+
+// ________________ Start Home _________________________________
+// ________________ End Home _________________________________
+
+
+
+// ________________ Start Brands _________________________________
+model Brand {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String @unique
+  imageUrl        String    
+  nameEn     String
+  nameAr     String
+  titleEn     String
+  titleAr     String
+  brandFeature    BrandFeature[]
+  position     Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model BrandFeature {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  titleEn      String
+  titleAr      String
+  featureEn   String
+  featureAr   String
+  imageUrl    String
+  brandId   String          @db.ObjectId
+  brand     Brand   @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  
+}
+
+// ========= All Brands ============
+
+model AllBrands {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+
+  nameEn String
+  nameAr String
+
+  titleEn String
+  titleAr String
+  
+
+  imageUrl String
+
+  brandImages BrandImages[]
+
+  isFeatured Boolean @default(false)
+  isArchived Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model BrandImages {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  allBrandsId String           @db.ObjectId
+  allBrands   AllBrands @relation(fields: [allBrandsId], references: [id], onDelete: Cascade)
+  url           String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@index([allBrandsId])
+}
+
+
+// ________________ End Brands _________________________________
+
+
+// ________________ Start OurServices _________________________________
+model Services {
+  id          String           @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String @unique
+  imageUrl        String
+  nameEn     String
+  nameAr     String
+  titleEn     String
+  titleAr     String
+  position     Int?
+  serviceFeature    ServiceFeature[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ServiceFeature {
+  id           String          @id @default(auto()) @map("_id") @db.ObjectId
+  nameEn       String
+  nameAr       String
+  titleEn      String
+  titleAr      String
+  imageUrl     String
+  servicesId   String          @db.ObjectId
+  services     Services   @relation(fields: [servicesId], references: [id], onDelete: Cascade)
+}
+
+// ________________ End OurServices _________________________________
+
+
+// ________________ Start Feature _________________________________
+model BrandQrCode {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  nameEn String
+  nameAr String
+  imageUrl String
+
+  authorEmail String?
+  author      User?   @relation(fields: [authorEmail], references: [email])
+  qrcodes QRCode[] @relation("QRCodeToProduct")
+  position  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QRCode {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  title      String
+  type       String
+  content    String
+  color      String   @default("#000000")
+  logoUrl    String?  @map("logo_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  userId     String?  @map("user_id")
+  brandQrCodeId String   @db.ObjectId
+  brandQrCode   BrandQrCode @relation("QRCodeToProduct", fields: [brandQrCodeId], references: [id], onDelete: Cascade)
+
+  @@map("qr_codes")
+}
+
+// ________________ End Feature _________________________________
+
+
+
+// ________________ Start Questions FAQ _________________________________
+model FAQCategory {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  slug       String    @unique
+  nameEn     String
+  nameAr     String
+  imageUrl   String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+
+model FAQ {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  questionEn String
+  questionAr String
+  answerEn String @default("")
+  answerAr String @default("")
+  imageUrl String @default("")
+  bgUrl    String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// ________________ End Questions _________________________________
+
+
+
+// ________________ Start Blogs Or News _________________________________
+
+model NewsCategory {
+ id      String @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  news    News[] @relation("CategoryToNews")
+  nameEn String
+  nameAr String
+  imageUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model News {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  titleEn String
+  titleAr String
+
+  subtitleEn String
+  subtitleAr String
+
+
+  fcaebookLink   String?
+  instgramLink   String?
+  tiktokLink     String?
+
+  videoUrl   String
+  imageUrl String
+
+  newsCategoryId String           @db.ObjectId
+  newsCategory   NewsCategory @relation("CategoryToNews", fields: [newsCategoryId], references: [id], onDelete: Cascade)
+
+  isFeatured Boolean  @default(false)
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+ 
+}
+
+
+// ________________ End Blogs Or News _________________________________
+
+
+
+
+// ________________ Start Teamwork _________________________________
+
+model Teamwork {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  slug    String @unique
+  name    String
+  position   String
+  title   String
+  imageUrl String
+  isFeatured Boolean  @default(false)
+  isArchived Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+// ________________ End Teamwork _________________________________
+
+
+
+// ________________ Start ContactUs _________________________________
+// ________________ End ContactUs _________________________________
+
+
+
+
+model Category {
+  id       String    @id @default(auto()) @map("_id") @db.ObjectId
+  slug     String    @unique
+  products Product[] @relation("CategoryToProduct")
+
+  nameEn String
+  nameAr String
+
+  titleEn String
+  titleAr String
+
+  subtitleEn String
+  subtitleAr String
+
+  imageUrl String
+  bgImage  String
+
+  
+
+  isFeatured Boolean @default(false)
+  isArchived Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  nameEn String
+  nameAr String
+
+  titleEn      String
+  titleAr      String
+  subtitleEn   String
+  subtitleAr   String
+  link         String
+  bannerImages BannerImages[]
+  isFeatured   Boolean        @default(false)
+  isArchived   Boolean        @default(false)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model BannerImages {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  bannerId  String   @db.ObjectId
+  Banner    Banner   @relation(fields: [bannerId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id   String @id @default(auto()) @map("_id") @db.ObjectId
+  slug String @unique
+
+  
+  categoryId String   @db.ObjectId
+  category   Category @relation("CategoryToProduct", fields: [categoryId], references: [id])
+
+  
+  imageUrl String   @default("")
+  images   Images[]
+
+  titleEn    String @default("")
+  titleAr    String @default("")
+  subtitleEn String @default("")
+  subtitleAr String @default("")
+
+  structureEn String @default("")
+  structureAr String @default("")
+
+  shelfLifeEn String @default("")
+  shelfLifeAr String @default("")
+
+  fillingEn String @default("")
+  fillingAr String @default("")
+
+  storageEn String @default("")
+  storageAr String @default("")
+
+  price    Int
+  quantity Int
+  orderItems OrderItem[]
+
+
+
+  isBestSeller Boolean @default(false)
+  isFeatured   Boolean @default(false)
+  isArchived   Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+model Images {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId String   @db.ObjectId
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+}
+
+// ============ HOME Page Structure - END =========================
+
+
+// _____________ When Make Ordring  _______________________
+
+model Order {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  isPaid         Boolean         @default(false)
+  status         OrderStatus?    @default(PENDING)
+  deliveryStatus DeliveryStatus?
+  paymentMethod  PaymentMethod?
+  totalPrice     Int?
+
+  name    String @default("")
+  phone   String @default("")
+  address String @default("")
+  zipCode String @default("")
+  city    String @default("")
+  branch  String @default("")
+
+  orderItem OrderItem[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model OrderItem {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  orderId    String  @db.ObjectId
+  order      Order   @relation(fields: [orderId], references: [id])
+  userId     String? @db.ObjectId
+  user       User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quantity   Int?
+  totalPrice Int?
+  productId  String  @db.ObjectId
+  product    Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  PAYMENT_AT_BRANCH
+  WHATSUP
+  STRIPE
+  PAYMOB
+}
+
+// ============ NOTIFICATION SYSTEM =========================
