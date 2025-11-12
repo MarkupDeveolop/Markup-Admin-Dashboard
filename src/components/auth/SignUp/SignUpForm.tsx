@@ -122,7 +122,6 @@ const SignUpForm = () => {
         name: data.name,
         email: data.email,
         phone: data.phone,
-        userPlatform: "DASHBOARD",
 
         password: data.password
       });

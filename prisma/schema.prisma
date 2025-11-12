@@ -38,19 +38,17 @@ model Session {
 model User {
   id             String        @id @default(auto()) @map("_id") @db.ObjectId
   name           String?
-  email          String?       @unique
+  email          String        @unique
   emailVerified  DateTime?
   image          String?
-  hashedPassword String?
-  role           Role          @default(USER) // Added role field
+  hashedPassword String
+  role           Role          @default(USER)
   createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt // Fixed naming inconsistency
+  updatedAt      DateTime      @updatedAt
   phone          String?
   accounts       Account[]
   sessions       Session[]
-    brandQrCode BrandQrCode[]
-
-  OrderItem OrderItem[]
+  OrderItem      OrderItem[]
 }
 
 model VerificationToken {
@@ -241,8 +239,7 @@ model BrandQrCode {
   nameAr String
   imageUrl String
 
-  authorEmail String?
-  author      User?   @relation(fields: [authorEmail], references: [email])
+ 
   qrcodes QRCode[] @relation("QRCodeToProduct")
   position  Int?
 

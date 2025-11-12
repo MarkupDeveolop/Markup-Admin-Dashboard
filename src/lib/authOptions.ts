@@ -5,7 +5,6 @@ import bcrypt from "bcryptjs";
 import prisma from "./prismaDB/prismadb";
 
 export const authOptions: NextAuthOptions = {
-  // Prisma Adapter for connecting NextAuth with your Prisma DB
   adapter: PrismaAdapter(prisma),
 
   providers: [
@@ -16,87 +15,51 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials.password) {
-          throw new Error("Invalid email or password");
+        if (!credentials?.email || !credentials?.password) {
+          console.error("Missing credentials");
+          return null; // ✅ Return null (do not throw)
         }
 
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
-          },
+          where: { email: credentials.email },
         });
 
-        if (!user || !user?.hashedPassword) {
-          throw new Error("Invalid email or password");
+        if (!user || !user.hashedPassword) {
+          console.error("Invalid user or missing password hash");
+          return null; // ✅ Return null safely
         }
 
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
-          user.hashedPassword,
+          user.hashedPassword
         );
 
         if (!isCorrectPassword) {
-          throw new Error("Invalid email or password");
+          console.error("Incorrect password");
+          return null; // ✅ Return null safely
         }
 
-        return { id: user.id, email: user.email, name: user.name }; // Include necessary fields
+        // ✅ Return a valid object (NextAuth requires a serializable user)
+        return {
+          id: String(user.id),
+          name: user.name,
+          email: user.email,
+        };
       },
     }),
   ],
 
-  // Session configuration
   session: {
-    strategy: "jwt", // Use JSON Web Tokens for session handling
-    maxAge: 7 * 24 * 60 * 60, // Session lasts for 7 days
+    strategy: "jwt",
+    maxAge: 7 * 24 * 60 * 60, // 7 days
   },
 
-  // JWT configuration
   jwt: {
-    secret: process.env.NEXTAUTH_SECRET, // Ensure this is set in .env
-    maxAge: 7 * 24 * 60 * 60, // Token expires after 7 days
+    secret: process.env.NEXTAUTH_SECRET!,
+    maxAge: 7 * 24 * 60 * 60,
   },
 
-  // Debugging for development
+  secret: process.env.NEXTAUTH_SECRET!,
+
   debug: process.env.NODE_ENV === "development",
-
-  // Pages configuration
-
-  // Callbacks for token and session handling
-  // callbacks: {
-  //   async jwt({ token, user }) {
-  //     // Attach user ID to token on login
-  //     if (user) {
-  //       token.id = user.id;
-  //     }
-  //     console.log("JWT Callback:", { token, user });
-  //     return token;
-  //   },
-  //   async session({ session, token }) {
-  //     // Include token data in the session object
-  //     if (token) {
-  //       session.user = {
-  //         ...session.user,
-  //         id: token.id, // Attach user ID to session
-  //       };
-  //     }
-  //     console.log("Session Callback:", { session, token });
-  //     return session;
-  //   },
-  // },
-
-  // // Cookies configuration for cross-device compatibility
-  // cookies: {
-  //   sessionToken: {
-  //     name: `__Secure-next-auth.session-token`,
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: "lax",
-  //       path: "/",
-  //       secure: process.env.NODE_ENV === "production",
-  //     },
-  //   },
-  // },
-
-  // Secret for signing tokens and sessions
-  secret: process.env.NEXTAUTH_SECRET,
 };
